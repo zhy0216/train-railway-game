@@ -223,15 +223,6 @@ body {
   background: linear-gradient(180deg, #90A4AE, #607D8B);
   box-shadow: 0 4px 12px rgba(96,125,139,0.3);
 }
-.ctrl-btn.eraser-active {
-  background: linear-gradient(180deg, #EF5350, #D32F2F) !important;
-  box-shadow: 0 0 16px rgba(211,47,47,0.5), 0 4px 12px rgba(211,47,47,0.35) !important;
-  animation: eraserPulse 1.2s ease-in-out infinite;
-}
-@keyframes eraserPulse {
-  0%, 100% { box-shadow: 0 0 12px rgba(211,47,47,0.4), 0 4px 12px rgba(211,47,47,0.3); }
-  50%      { box-shadow: 0 0 22px rgba(211,47,47,0.6), 0 4px 16px rgba(211,47,47,0.4); }
-}
 
 /* ====== 弹窗 ====== */
 #modalOverlay {

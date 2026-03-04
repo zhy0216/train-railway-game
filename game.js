@@ -29,7 +29,6 @@
   let placed = [];
   let pieces = {};
   let selectedTool = null;
-  let eraserMode = false;
   let hoverCell = null;
   let animating = false;
   let trainPos = null;
@@ -89,7 +88,6 @@
     pieces = {};
     for (const [k, v] of Object.entries(level.pieces)) pieces[k] = v;
     selectedTool = null;
-    eraserMode = false;
     animating = false;
     trainPos = null;
     trainAnim = null;
@@ -98,7 +96,6 @@
     fuelDisplay = maxFuel;
     particles = [];
     placeAnims = [];
-    document.getElementById('btnEraser').classList.remove('eraser-active');
     updateTopBar();
     buildToolbar();
     onResize();
@@ -151,14 +148,12 @@
       const type = item.dataset.type;
       item.querySelector('.tool-badge').textContent = pieces[type];
       item.classList.toggle('empty', pieces[type] <= 0);
-      item.classList.toggle('selected', selectedTool === type && !eraserMode);
+      item.classList.toggle('selected', selectedTool === type);
     });
   }
 
   function selectTool(type) {
     if (pieces[type] <= 0) return;
-    eraserMode = false;
-    document.getElementById('btnEraser').classList.remove('eraser-active');
     selectedTool = (selectedTool === type) ? null : type;
     refreshToolbar();
   }
@@ -254,7 +249,8 @@
 
     failInfo = null; // 放置/擦除时清除失败标记
 
-    if (eraserMode) {
+    // 没有选中铁轨时，点击已放置的铁轨则删除
+    if (!selectedTool) {
       if (placed[r][c]) {
         pieces[placed[r][c].type]++;
         placed[r][c] = null;
@@ -263,8 +259,6 @@
       }
       return;
     }
-
-    if (!selectedTool) return;
 
     if (placed[r][c]) pieces[placed[r][c].type]++;
     if (pieces[selectedTool] <= 0) {
@@ -476,8 +470,8 @@
       const { row, col } = hoverCell;
       const v = level.grid[row][col];
       if (v === 0 || v === 'G') {
-        if (eraserMode && placed[row][col]) {
-          // 橡皮擦红色覆盖 + X
+        if (!selectedTool && placed[row][col]) {
+          // 未选铁轨时，悬浮已放置铁轨显示红色 X 提示可删除
           ctx.fillStyle = 'rgba(231, 76, 60, 0.25)';
           ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
           ctx.strokeStyle = 'rgba(231, 76, 60, 0.6)';
@@ -487,7 +481,7 @@
           const x = col * cellSize, y = row * cellSize;
           ctx.beginPath(); ctx.moveTo(x + m, y + m); ctx.lineTo(x + cellSize - m, y + cellSize - m); ctx.stroke();
           ctx.beginPath(); ctx.moveTo(x + cellSize - m, y + m); ctx.lineTo(x + m, y + cellSize - m); ctx.stroke();
-        } else if (!eraserMode && selectedTool) {
+        } else if (selectedTool) {
           // 半透明轨道预览
           ctx.save();
           ctx.globalAlpha = 0.32;
@@ -1284,12 +1278,6 @@
       // 保留 failInfo，让玩家看到断开位置
     },
     nextLevel() { closeModal(); loadLevel(currentLevel + 1); },
-    toggleEraser() {
-      eraserMode = !eraserMode;
-      if (eraserMode) selectedTool = null;
-      document.getElementById('btnEraser').classList.toggle('eraser-active', eraserMode);
-      refreshToolbar();
-    },
     openLevelSelect,
     closeLevelSelect,
   };
