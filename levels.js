@@ -93,7 +93,7 @@ const LEVELS = [
       [0, 0, 0, 0, 0, 0],
     ],
     startDir: 'right',
-    pieces: { 'straight-h': 3, 'straight-v': 2, 'turn-ld': 1, 'turn-ru': 1 },
+    pieces: { 'straight-h': 3, 'straight-v': 2, 'turn-ld': 1, 'turn-ru': 1, 'turn-lu': 1 },
     stars: [6, 8],
   },
   // 2-2: 起点向下出发

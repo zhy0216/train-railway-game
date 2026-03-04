@@ -35,6 +35,7 @@
   let trainPos = null;
   let maxFuel = 0;
   let fuelDisplay = 0;
+  let failInfo = null;       // { row, col, reason } 路径断开位置
 
   // ====== 动画状态 ======
   let lastFrameTime = 0;
@@ -250,6 +251,8 @@
     const cellVal = level.grid[r][c];
     if (cellVal === 1 || cellVal === 'S' || cellVal === 'E') return;
     if (cellVal !== 0 && cellVal !== 'G') return;
+
+    failInfo = null; // 放置/擦除时清除失败标记
 
     if (eraserMode) {
       if (placed[r][c]) {
@@ -499,6 +502,26 @@
       }
     }
 
+    // 失败位置高亮闪烁
+    if (failInfo && !animating) {
+      const fi = failInfo;
+      const fx = fi.col * cellSize, fy = fi.row * cellSize;
+      const pulse = 0.35 + Math.sin(ts / 250) * 0.25;
+      ctx.fillStyle = `rgba(244, 67, 54, ${pulse})`;
+      ctx.beginPath();
+      ctx.roundRect(fx + 2, fy + 2, cellSize - 4, cellSize - 4, 4);
+      ctx.fill();
+      ctx.strokeStyle = `rgba(244, 67, 54, ${pulse + 0.2})`;
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(fx + 1, fy + 1, cellSize - 2, cellSize - 2);
+      // ✕ 标记
+      ctx.font = `bold ${cellSize * 0.35}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = `rgba(255, 255, 255, ${pulse + 0.3})`;
+      ctx.fillText('✕', fx + cellSize / 2, fy + cellSize / 2);
+    }
+
     // 火车
     if (trainPos) {
       drawTrain(trainPos.x, trainPos.y, trainPos.dir, ts);
@@ -596,7 +619,7 @@
     ctx.fill();
   }
 
-  // ====== 起点 (脉冲光晕) ======
+  // ====== 起点 (脉冲光晕 + 方向箭头) ======
   function drawStart(x, y, ts) {
     const s = cellSize;
     const pulse = 0.18 + Math.sin(ts / 600) * 0.08;
@@ -616,6 +639,41 @@
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('🚉', x + s / 2, y + s / 2);
+    // 起始方向箭头
+    drawStartDirArrow(x, y, s, ts);
+  }
+
+  // 绘制起点方向箭头（动态呼吸 + 来回位移）
+  function drawStartDirArrow(x, y, s, ts) {
+    const dir = level.startDir;
+    const cx = x + s / 2, cy = y + s / 2;
+    // 箭头方向角度: right=0, down=90, left=180, up=270
+    const angles = { right: 0, down: Math.PI / 2, left: Math.PI, up: -Math.PI / 2 };
+    const angle = angles[dir];
+    // 箭头沿出发方向偏移到格子边缘外
+    const [dr, dc] = DIR_DELTA[dir];
+    const baseOff = s * 0.45;
+    const bounce = Math.sin(ts / 400) * s * 0.06;
+    const ox = cx + dc * (baseOff + bounce);
+    const oy = cy + dr * (baseOff + bounce);
+    // 箭头大小
+    const aLen = s * 0.18;
+    const aW = s * 0.13;
+    const alpha = 0.7 + Math.sin(ts / 400) * 0.3;
+    ctx.save();
+    ctx.translate(ox, oy);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.moveTo(aLen, 0);
+    ctx.lineTo(-aLen * 0.3, -aW);
+    ctx.lineTo(-aLen * 0.3, aW);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(56, 142, 60, ${alpha})`;
+    ctx.fill();
+    ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.8})`;
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    ctx.restore();
   }
 
   // ====== 终点 (脉冲光晕) ======
@@ -974,7 +1032,7 @@
   function buildPath() {
     const start = findCell('S');
     const end = findCell('E');
-    if (!start || !end) return null;
+    if (!start || !end) { failInfo = { row: 0, col: 0, reason: 'missing' }; return { path: [], success: false }; }
 
     const path = [{ row: start.row, col: start.col, dir: level.startDir }];
     let curRow = start.row, curCol = start.col, curDir = level.startDir;
@@ -982,41 +1040,67 @@
     const visited = new Set();
     visited.add(`${curRow},${curCol},${curDir}`);
 
+    const DIR_LABEL = { left: '左', right: '右', up: '上', down: '下' };
+
     for (let step = 0; step < rows * cols * 4 + 10; step++) {
       const [dr, dc] = DIR_DELTA[curDir];
       const nr = curRow + dr, nc = curCol + dc;
-      if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) return null;
+      if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) {
+        failInfo = { row: curRow, col: curCol, reason: `火车往${DIR_LABEL[curDir]}驶出了地图边界` };
+        return { path, success: false };
+      }
 
       if (level.grid[nr][nc] === 'E') {
         if (maxFuel > 0) fuel--;
-        if (fuel < 0) return null;
+        if (fuel < 0) {
+          failInfo = { row: nr, col: nc, reason: '燃料不足，到不了终点' };
+          path.push({ row: nr, col: nc, dir: curDir, fuel });
+          return { path, success: false };
+        }
         path.push({ row: nr, col: nc, dir: curDir, fuel });
-        return path;
+        failInfo = null;
+        return { path, success: true };
+      }
+
+      if (level.grid[nr][nc] === 1) {
+        failInfo = { row: nr, col: nc, reason: `火车往${DIR_LABEL[curDir]}撞到了障碍物` };
+        return { path, success: false };
       }
 
       const track = placed[nr][nc];
-      if (!track) return null;
+      if (!track) {
+        failInfo = { row: nr, col: nc, reason: `这里缺少铁轨` };
+        return { path, success: false };
+      }
       const enterDir = OPPOSITE[curDir];
       const conns = TRACK_CONNECTIONS[track.type];
-      if (!conns.includes(enterDir)) return null;
+      if (!conns.includes(enterDir)) {
+        failInfo = { row: nr, col: nc, reason: `火车从${DIR_LABEL[enterDir]}边进入，但此铁轨接不上` };
+        return { path, success: false };
+      }
 
       let exitDir = track.type === 'cross' ? curDir : conns.find(d => d !== enterDir);
-      if (!exitDir) return null;
+      if (!exitDir) { failInfo = { row: nr, col: nc, reason: '铁轨没有出口方向' }; return { path, success: false }; }
 
       if (maxFuel > 0) {
         fuel--;
-        if (fuel < 0) return null;
+        if (fuel < 0) {
+          failInfo = { row: nr, col: nc, reason: '燃料耗尽！' };
+          path.push({ row: nr, col: nc, dir: curDir, fuel });
+          return { path, success: false };
+        }
         if (level.grid[nr][nc] === 'G') fuel = maxFuel;
       }
 
       const key = `${nr},${nc},${exitDir}`;
-      if (visited.has(key)) return null;
+      if (visited.has(key)) { failInfo = { row: nr, col: nc, reason: '铁轨形成了死循环' }; return { path, success: false }; }
       visited.add(key);
 
       curRow = nr; curCol = nc; curDir = exitDir;
       path.push({ row: nr, col: nc, dir: curDir, fuel });
     }
-    return null;
+    failInfo = { row: curRow, col: curCol, reason: '路径太长了' };
+    return { path, success: false };
   }
 
   // ====== 缓动 ======
@@ -1025,7 +1109,7 @@
   }
 
   // ====== 火车动画 (集成到游戏循环) ======
-  function startTrainAnimation(path) {
+  function startTrainAnimation(path, isFail) {
     animating = true;
     trainAnim = {
       path,
@@ -1034,6 +1118,8 @@
       stepDuration: 350,
       startFuel: maxFuel,
       winTimer: 0,
+      isFail: !!isFail,
+      failTimer: 0,
     };
     fuelDisplay = maxFuel;
   }
@@ -1047,6 +1133,19 @@
       const last = path[path.length - 1];
       trainPos = { ...getPixelPos(last.row, last.col), dir: last.dir };
       if (maxFuel > 0 && last.fuel !== undefined) fuelDisplay = last.fuel;
+
+      // 失败模式：火车跑到断开处后弹出失败
+      if (trainAnim.isFail) {
+        if (!trainAnim.failTimer) {
+          trainAnim.failTimer = now;
+        }
+        if (now - trainAnim.failTimer > 400) {
+          animating = false;
+          trainAnim = null;
+          showFail();
+        }
+        return;
+      }
 
       if (!trainAnim.winTimer) {
         trainAnim.winTimer = now;
@@ -1126,7 +1225,8 @@
   function showFail() {
     const overlay = document.getElementById('modalOverlay');
     document.getElementById('modalIcon').textContent = '😢';
-    document.getElementById('modalTitle').textContent = '铁轨没有连通…';
+    const reason = failInfo ? failInfo.reason : '铁轨没有连通';
+    document.getElementById('modalTitle').textContent = reason;
     document.getElementById('modalStars').textContent = '';
     document.getElementById('modalButtons').innerHTML =
       '<button class="ctrl-btn orange" onclick="game.retry()">重试</button>';
@@ -1166,20 +1266,22 @@
   window.game = {
     run() {
       if (animating) return;
-      const path = buildPath();
-      if (path) {
-        startTrainAnimation(path);
+      failInfo = null;
+      const result = buildPath();
+      if (result.path.length > 0) {
+        startTrainAnimation(result.path, !result.success);
       } else {
         showFail();
       }
     },
-    resetLevel() { closeModal(); loadLevel(currentLevel); },
+    resetLevel() { closeModal(); failInfo = null; loadLevel(currentLevel); },
     retry() {
       closeModal();
       trainPos = null;
       trainAnim = null;
       animating = false;
       fuelDisplay = maxFuel;
+      // 保留 failInfo，让玩家看到断开位置
     },
     nextLevel() { closeModal(); loadLevel(currentLevel + 1); },
     toggleEraser() {

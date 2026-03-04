@@ -349,6 +349,12 @@ body {
 }
 .level-btn:active { background: #e8f5e9; transform: scale(0.98); }
 .level-btn.current { border-color: #4CAF50; background: #e8f5e9; }
+.back-btn {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin-top: 14px;
+}
 
 /* ====== 火车晃动动画 ====== */
 @keyframes chug {
