@@ -1,0 +1,55 @@
+{
+  "id": "1-1",
+  "rows": 5,
+  "cols": 5,
+  "grid": [
+    [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      "S",
+      0,
+      "E",
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  ],
+  "startDir": "right",
+  "pieces": {
+    "straight-h": 2
+  },
+  "stars": [
+    2,
+    3
+  ],
+  "fuel": null,
+  "metadata": {
+    "difficulty": "easy",
+    "generatedBy": "manual"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "id": "4-2",
+  "rows": 5,
+  "cols": 7,
+  "grid": [
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      "S",
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      "G",
+      0,
+      0,
+      1,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      "G",
+      "E",
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  ],
+  "startDir": "down",
+  "pieces": {
+    "straight-h": 4,
+    "straight-v": 3,
+    "turn-rd": 1,
+    "turn-ld": 1,
+    "turn-ru": 1,
+    "turn-lu": 1
+  },
+  "stars": [
+    8,
+    11
+  ],
+  "fuel": 7,
+  "metadata": {
+    "difficulty": "hard",
+    "generatedBy": "manual"
+  }
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "name": "🌱 学会直线和转弯",
+    "levels": [
+      "chapter1/level-01.json",
+      "chapter1/level-02.json",
+      "chapter1/level-03.json",
+      "chapter1/level-04.json",
+      "chapter1/level-05.json"
+    ]
+  },
+  {
+    "name": "⛰️ 绕过障碍",
+    "levels": [
+      "chapter2/level-06.json",
+      "chapter2/level-07.json",
+      "chapter2/level-08.json",
+      "chapter2/level-09.json",
+      "chapter2/level-10.json"
+    ]
+  },
+  {
+    "name": "🏔️ 高手挑战",
+    "levels": [
+      "chapter3/level-11.json",
+      "chapter3/level-12.json",
+      "chapter3/level-13.json",
+      "chapter3/level-14.json",
+      "chapter3/level-15.json"
+    ]
+  },
+  {
+    "name": "🔥 燃料挑战",
+    "levels": [
+      "chapter4/level-16.json",
+      "chapter4/level-17.json",
+      "chapter4/level-18.json",
+      "chapter4/level-19.json",
+      "chapter4/level-20.json"
+    ]
+  }
+]

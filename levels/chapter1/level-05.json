@@ -1,0 +1,63 @@
+{
+  "id": "1-5",
+  "rows": 5,
+  "cols": 6,
+  "grid": [
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      "S",
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      "E",
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  ],
+  "startDir": "right",
+  "pieces": {
+    "straight-h": 4,
+    "straight-v": 1,
+    "turn-ld": 1,
+    "turn-ru": 1
+  },
+  "stars": [
+    6,
+    8
+  ],
+  "fuel": null,
+  "metadata": {
+    "difficulty": "easy",
+    "generatedBy": "manual"
+  }
+}
