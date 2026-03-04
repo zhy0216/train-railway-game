@@ -1,0 +1,12 @@
+{
+  "name": "train-railway-game",
+  "version": "1.0.0",
+  "scripts": {
+    "generate": "bun run scripts/generate.ts",
+    "build": "bun run scripts/build-levels.ts",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
