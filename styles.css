@@ -88,6 +88,21 @@ body {
   font-size: 22px;
   letter-spacing: 2px;
 }
+#muteBtn {
+  cursor: pointer;
+  font-size: 20px;
+  padding: 5px 8px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.5);
+  transition: all 0.15s;
+}
+#muteBtn:active {
+  background: rgba(255,255,255,0.65);
+  transform: scale(0.97);
+}
 
 /* ====== Canvas 区域 ====== */
 #canvasWrap {

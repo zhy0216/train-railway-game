@@ -50,6 +50,13 @@
   }
 
   // ====== 初始化 ======
+  let soundInited = false;
+  function initSound() {
+    if (soundInited) return;
+    soundInited = true;
+    if (window.sound) sound.init();
+  }
+
   function init() {
     canvas = document.getElementById('gameCanvas');
     ctx = canvas.getContext('2d');
@@ -59,6 +66,9 @@
     canvas.addEventListener('touchstart', onTouchStart, { passive: false });
     window.addEventListener('resize', onResize);
     document.getElementById('levelLabel').addEventListener('click', () => game.openLevelSelect());
+    // 初始化音效（首次交互时）
+    document.addEventListener('click', initSound, { once: true });
+    document.addEventListener('touchstart', initSound, { once: true });
     loadLevel(0);
     requestAnimationFrame(gameLoop);
   }
@@ -156,6 +166,7 @@
     if (pieces[type] <= 0) return;
     selectedTool = (selectedTool === type) ? null : type;
     refreshToolbar();
+    if (window.sound) sound.playSelect();
   }
 
   function drawTrackPreview(mc, type) {
@@ -256,6 +267,7 @@
         placed[r][c] = null;
         spawnParticles(c * cellSize + cellSize / 2, r * cellSize + cellSize / 2, 'erase');
         refreshToolbar();
+        if (window.sound) sound.playErase();
       }
       return;
     }
@@ -271,6 +283,7 @@
     placeAnims.push({ row: r, col: c, startTime: gameTime });
     spawnParticles(c * cellSize + cellSize / 2, r * cellSize + cellSize / 2, 'place');
     refreshToolbar();
+    if (window.sound) sound.playPlace();
   }
 
   // ====== 粒子系统 ======
@@ -1116,6 +1129,10 @@
       failTimer: 0,
     };
     fuelDisplay = maxFuel;
+    if (window.sound) {
+      sound.playWhistle();
+      setTimeout(() => { if (window.sound && animating) sound.startChug(); }, 500);
+    }
   }
 
   function updateTrainAnimation(now) {
@@ -1199,6 +1216,7 @@
   }
 
   function showWin() {
+    if (window.sound) { sound.stopChug(); sound.playWin(); }
     const stars = calcStars();
     const starStr = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
     document.getElementById('starsDisplay').textContent = starStr;
@@ -1217,6 +1235,7 @@
   }
 
   function showFail() {
+    if (window.sound) { sound.stopChug(); sound.playFail(); }
     const overlay = document.getElementById('modalOverlay');
     document.getElementById('modalIcon').textContent = '😢';
     const reason = failInfo ? failInfo.reason : '铁轨没有连通';
@@ -1260,7 +1279,9 @@
   window.game = {
     run() {
       if (animating) return;
+      initSound();
       failInfo = null;
+      if (window.sound) sound.playClick();
       const result = buildPath();
       if (result.path.length > 0) {
         startTrainAnimation(result.path, !result.success);
@@ -1268,8 +1289,12 @@
         showFail();
       }
     },
-    resetLevel() { closeModal(); failInfo = null; loadLevel(currentLevel); },
+    resetLevel() {
+      if (window.sound) { sound.stopChug(); sound.playClick(); }
+      closeModal(); failInfo = null; loadLevel(currentLevel);
+    },
     retry() {
+      if (window.sound) { sound.stopChug(); sound.playClick(); }
       closeModal();
       trainPos = null;
       trainAnim = null;
@@ -1277,9 +1302,19 @@
       fuelDisplay = maxFuel;
       // 保留 failInfo，让玩家看到断开位置
     },
-    nextLevel() { closeModal(); loadLevel(currentLevel + 1); },
+    nextLevel() {
+      if (window.sound) sound.playClick();
+      closeModal(); loadLevel(currentLevel + 1);
+    },
     openLevelSelect,
     closeLevelSelect,
+    toggleSound() {
+      initSound();
+      if (window.sound) {
+        const m = sound.toggleMute();
+        document.getElementById('muteBtn').textContent = m ? '🔇' : '🔊';
+      }
+    },
   };
 
   document.addEventListener('DOMContentLoaded', init);
