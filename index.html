@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>小火车铺铁路 🚂</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- 浮动云朵 -->
+  <div id="skyBg">
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="cloud c3"></div>
+    <div class="cloud c4"></div>
+  </div>
+
+  <!-- 顶部状态栏 -->
+  <div id="topBar">
+    <span id="levelLabel">🌱 1-1</span>
+    <span id="starsDisplay">☆☆☆</span>
+  </div>
+
+  <!-- Canvas 游戏区域 -->
+  <div id="canvasWrap">
+    <canvas id="gameCanvas"></canvas>
+  </div>
+
+  <!-- 工具栏 -->
+  <div id="toolbar"></div>
+
+  <!-- 底部控制按钮 -->
+  <div id="controls">
+    <button id="btnPlay" class="ctrl-btn green" onclick="game.run()">▶️ 出发</button>
+    <button id="btnReset" class="ctrl-btn orange" onclick="game.resetLevel()">🔄 重置</button>
+    <button id="btnEraser" class="ctrl-btn gray" onclick="game.toggleEraser()">🧹 橡皮</button>
+  </div>
+
+  <!-- 弹窗 -->
+  <div id="modalOverlay" class="hidden">
+    <div id="modal">
+      <div id="modalIcon"></div>
+      <div id="modalTitle"></div>
+      <div id="modalStars"></div>
+      <div id="modalButtons"></div>
+    </div>
+  </div>
+
+  <!-- 关卡选择 -->
+  <div id="levelSelectOverlay" class="hidden">
+    <div id="levelSelect">
+      <h2>选择关卡</h2>
+      <div id="levelList"></div>
+      <button class="ctrl-btn gray" onclick="game.closeLevelSelect()" style="margin-top:12px">返回</button>
+    </div>
+  </div>
+
+  <script src="levels.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
