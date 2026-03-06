@@ -550,7 +550,7 @@
           const x = col * cellSize, y = row * cellSize;
           ctx.beginPath(); ctx.moveTo(x + m, y + m); ctx.lineTo(x + cellSize - m, y + cellSize - m); ctx.stroke();
           ctx.beginPath(); ctx.moveTo(x + cellSize - m, y + m); ctx.lineTo(x + m, y + cellSize - m); ctx.stroke();
-        } else if (selectedTool) {
+        } else if (selectedTool && selectedTool !== 'eraser') {
           // 半透明轨道预览
           ctx.save();
           ctx.globalAlpha = 0.32;
