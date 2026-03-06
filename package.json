@@ -2,11 +2,15 @@
   "name": "train-railway-game",
   "version": "1.0.0",
   "scripts": {
+    "dev": "bun run build:levels && vite",
+    "build": "bun run build:levels && vite build",
+    "preview": "vite preview",
+    "build:levels": "bun run scripts/build-levels.ts",
     "generate": "bun run scripts/generate.ts",
-    "build": "bun run scripts/build-levels.ts",
     "test": "bun test"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "vite": "^7.3.1"
   }
 }
