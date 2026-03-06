@@ -113,9 +113,11 @@
 
   function onResize() {
     const wrap = document.getElementById('canvasWrap');
-    const maxW = Math.min(wrap.clientWidth - 16, 500);
-    cellSize = Math.floor(maxW / cols);
+    const maxW = Math.min(wrap.clientWidth - 16, 600);
+    const maxH = window.innerHeight * 0.55; // Don't exceed 55% of viewport height
     const fuelBarH = maxFuel > 0 ? 30 : 0;
+    cellSize = Math.floor(Math.min(maxW / cols, (maxH - fuelBarH) / rows));
+    cellSize = Math.max(cellSize, 24); // Minimum 24px per cell for legibility
     canvas.width = cellSize * cols;
     canvas.height = cellSize * rows + fuelBarH;
     canvas.style.width = canvas.width + 'px';
@@ -124,8 +126,16 @@
 
   // ====== 顶部栏 ======
   function updateTopBar() {
-    const chIdx = Math.floor(currentLevel / 5);
-    const lvIdx = currentLevel % 5 + 1;
+    let chIdx = 0, lvIdx = currentLevel + 1;
+    let count = 0;
+    for (let i = 0; i < CHAPTERS.length; i++) {
+      if (currentLevel < count + CHAPTERS[i].levels.length) {
+        chIdx = i;
+        lvIdx = currentLevel - count + 1;
+        break;
+      }
+      count += CHAPTERS[i].levels.length;
+    }
     const ch = CHAPTERS[chIdx];
     document.getElementById('levelLabel').textContent = ch.name.split(' ')[0] + ' ' + (chIdx + 1) + '-' + lvIdx;
     document.getElementById('starsDisplay').textContent = '☆☆☆';
@@ -1254,19 +1264,24 @@
   function openLevelSelect() {
     const list = document.getElementById('levelList');
     list.innerHTML = '';
+    let globalIdx = 0;
     CHAPTERS.forEach((ch, ci) => {
       const title = document.createElement('div');
       title.className = 'chapter-title';
       title.textContent = ch.name;
       list.appendChild(title);
-      ch.levels.forEach((_, li) => {
-        const idx = ci * 5 + li;
-        const btn = document.createElement('div');
-        btn.className = 'level-btn' + (idx === currentLevel ? ' current' : '');
-        btn.textContent = `${ci + 1}-${li + 1}`;
+      const grid = document.createElement('div');
+      grid.className = 'level-grid';
+      for (let li = 0; li < ch.levels.length; li++) {
+        const btn = document.createElement('button');
+        btn.className = 'level-btn';
+        btn.textContent = (ci + 1) + '-' + (li + 1);
+        const idx = globalIdx;
         btn.addEventListener('click', () => { closeLevelSelect(); loadLevel(idx); });
-        list.appendChild(btn);
-      });
+        grid.appendChild(btn);
+        globalIdx++;
+      }
+      list.appendChild(grid);
     });
     document.getElementById('levelSelectOverlay').classList.remove('hidden');
   }
