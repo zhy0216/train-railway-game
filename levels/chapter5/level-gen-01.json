@@ -1,0 +1,93 @@
+{
+  "id": "gen-1",
+  "rows": 7,
+  "cols": 7,
+  "grid": [
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    [
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      0,
+      "S",
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      0,
+      "E",
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+    ]
+  ],
+  "startDir": "left",
+  "pieces": {
+    "straight-h": 2,
+    "turn-rd": 1,
+    "straight-v": 1,
+    "turn-lu": 1
+  },
+  "stars": [
+    3,
+    4
+  ],
+  "fuel": null,
+  "metadata": {
+    "difficulty": "medium",
+    "difficultyScore": 2.8,
+    "solutionCount": 2,
+    "optimalPieceCount": 3,
+    "pathLength": 5,
+    "turnCount": 1,
+    "generatedBy": "csp-solver-v1",
+    "generatedAt": "2026-03-06T14:57:33.724Z",
+    "seed": 42002
+  }
+}

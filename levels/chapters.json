@@ -38,5 +38,25 @@
       "chapter4/level-19.json",
       "chapter4/level-20.json"
     ]
+  },
+  {
+    "name": "🧩 中级谜题",
+    "levels": [
+      "chapter5/level-gen-01.json",
+      "chapter5/level-gen-02.json",
+      "chapter5/level-gen-03.json",
+      "chapter5/level-gen-04.json",
+      "chapter5/level-gen-05.json"
+    ]
+  },
+  {
+    "name": "💎 高级谜题",
+    "levels": [
+      "chapter6/level-gen-01.json",
+      "chapter6/level-gen-02.json",
+      "chapter6/level-gen-03.json",
+      "chapter6/level-gen-04.json",
+      "chapter6/level-gen-05.json"
+    ]
   }
 ]
