@@ -160,12 +160,26 @@
       item.addEventListener('click', () => selectTool(type));
       bar.appendChild(item);
     }
+    // 铲子 (橡皮擦) 工具
+    const eraser = document.createElement('div');
+    eraser.className = 'tool-item';
+    eraser.dataset.type = 'eraser';
+    const ec = document.createElement('canvas');
+    ec.width = 40; ec.height = 40;
+    drawEraserIcon(ec);
+    eraser.appendChild(ec);
+    eraser.addEventListener('click', () => selectTool('eraser'));
+    bar.appendChild(eraser);
     refreshToolbar();
   }
 
   function refreshToolbar() {
     document.querySelectorAll('.tool-item').forEach(item => {
       const type = item.dataset.type;
+      if (type === 'eraser') {
+        item.classList.toggle('selected', selectedTool === 'eraser');
+        return;
+      }
       item.querySelector('.tool-badge').textContent = pieces[type];
       item.classList.toggle('empty', pieces[type] <= 0);
       item.classList.toggle('selected', selectedTool === type);
@@ -173,7 +187,7 @@
   }
 
   function selectTool(type) {
-    if (pieces[type] <= 0) return;
+    if (type !== 'eraser' && pieces[type] <= 0) return;
     selectedTool = (selectedTool === type) ? null : type;
     refreshToolbar();
     if (window.sound) sound.playSelect();
@@ -230,6 +244,38 @@
     }
   }
 
+  function drawEraserIcon(mc) {
+    const c = mc.getContext('2d');
+    const s = 40;
+    c.clearRect(0, 0, s, s);
+    // 铲头 (灰色梯形)
+    c.fillStyle = '#8E8E8E';
+    c.beginPath();
+    c.moveTo(s * 0.2, s * 0.55);
+    c.lineTo(s * 0.8, s * 0.55);
+    c.lineTo(s * 0.7, s * 0.85);
+    c.lineTo(s * 0.3, s * 0.85);
+    c.closePath();
+    c.fill();
+    c.strokeStyle = '#666';
+    c.lineWidth = 1.5;
+    c.stroke();
+    // 手柄 (棕色)
+    c.strokeStyle = '#8B5E3C';
+    c.lineWidth = 4;
+    c.lineCap = 'round';
+    c.beginPath();
+    c.moveTo(s * 0.5, s * 0.55);
+    c.lineTo(s * 0.5, s * 0.12);
+    c.stroke();
+    // 把手顶部横杆
+    c.lineWidth = 3;
+    c.beginPath();
+    c.moveTo(s * 0.35, s * 0.12);
+    c.lineTo(s * 0.65, s * 0.12);
+    c.stroke();
+  }
+
   // ====== Canvas 交互 ======
   function getCellFromPos(x, y) {
     const fuelBarH = maxFuel > 0 ? 30 : 0;
@@ -270,8 +316,8 @@
 
     failInfo = null; // 放置/擦除时清除失败标记
 
-    // 没有选中铁轨时，点击已放置的铁轨则删除
-    if (!selectedTool) {
+    // 铲子模式或未选工具时，点击已放置的铁轨则删除
+    if (!selectedTool || selectedTool === 'eraser') {
       if (placed[r][c]) {
         pieces[placed[r][c].type]++;
         placed[r][c] = null;
@@ -493,7 +539,7 @@
       const { row, col } = hoverCell;
       const v = level.grid[row][col];
       if (v === 0 || v === 'G') {
-        if (!selectedTool && placed[row][col]) {
+        if ((!selectedTool || selectedTool === 'eraser') && placed[row][col]) {
           // 未选铁轨时，悬浮已放置铁轨显示红色 X 提示可删除
           ctx.fillStyle = 'rgba(231, 76, 60, 0.25)';
           ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
