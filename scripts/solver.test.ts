@@ -12,7 +12,7 @@ describe("solver", () => {
       [0, 0, 0, 0, 0],
     ];
     const pieces: Partial<Record<TrackType, number>> = { "straight-h": 2 };
-    const results = solve({ grid, rows: 5, cols: 5, startDir: "right", pieces, maxSolutions: 10 });
+    const { solutions: results } = solve({ grid, rows: 5, cols: 5, startDir: "right", pieces, maxSolutions: 10 });
     expect(results.length).toBe(1);
     // The only solution places straight-h at (1,2) and (1,3) — but (1,3) is E, so only (1,2)
     // Actually: S is at (1,1), E is at (1,3). Train goes right from S.
@@ -35,7 +35,7 @@ describe("solver", () => {
       "straight-v": 2,
       "turn-ld": 1,
     };
-    const results = solve({ grid, rows: 5, cols: 5, startDir: "right", pieces, maxSolutions: 10 });
+    const { solutions: results } = solve({ grid, rows: 5, cols: 5, startDir: "right", pieces, maxSolutions: 10 });
     expect(results.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -49,7 +49,7 @@ describe("solver", () => {
     ];
     // Only vertical pieces — can't go right past obstacle
     const pieces: Partial<Record<TrackType, number>> = { "straight-v": 3 };
-    const results = solve({ grid, rows: 5, cols: 5, startDir: "right", pieces, maxSolutions: 10 });
+    const { solutions: results } = solve({ grid, rows: 5, cols: 5, startDir: "right", pieces, maxSolutions: 10 });
     expect(results.length).toBe(0);
   });
 
@@ -70,7 +70,7 @@ describe("solver", () => {
       "turn-ru": 3,
       "turn-lu": 3,
     };
-    const results = solve({ grid, rows: 5, cols: 5, startDir: "right", pieces, maxSolutions: 4 });
+    const { solutions: results } = solve({ grid, rows: 5, cols: 5, startDir: "right", pieces, maxSolutions: 4 });
     expect(results.length).toBeLessThanOrEqual(4);
   });
 
@@ -88,7 +88,7 @@ describe("solver", () => {
       "turn-ld": 1,
       "turn-ru": 1,
     };
-    const results = solve({
+    const { solutions: results } = solve({
       grid, rows: 5, cols: 6, startDir: "right", pieces, maxSolutions: 10, fuel: 8
     });
     expect(results.length).toBeGreaterThanOrEqual(1);

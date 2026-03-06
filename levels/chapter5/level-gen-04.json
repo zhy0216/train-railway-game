@@ -1,48 +1,111 @@
 {
   "id": "gen-4",
-  "rows": 7,
-  "cols": 7,
+  "rows": 10,
+  "cols": 10,
   "grid": [
     [
-      1,
-      0,
-      0,
-      0,
-      1,
-      0,
-      0
-    ],
-    [
       0,
       0,
       0,
       0,
-      1,
+      0,
+      0,
+      0,
+      0,
       0,
       0
     ],
     [
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
       0,
       "S",
       0,
+      1
+    ],
+    [
       0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
       0,
       "E",
-      0
-    ],
-    [
-      0,
-      0,
-      0,
-      0,
-      1,
       0,
       0
     ],
     [
       0,
       0,
+      0,
       1,
+      0,
+      0,
       0,
       0,
       0,
@@ -52,12 +115,6 @@
       0,
       0,
       1,
-      0,
-      1,
-      0,
-      0
-    ],
-    [
       0,
       0,
       0,
@@ -67,24 +124,29 @@
       0
     ]
   ],
-  "startDir": "right",
+  "startDir": "down",
   "pieces": {
-    "straight-h": 4
+    "turn-ru": 1,
+    "straight-h": 2,
+    "turn-ld": 1,
+    "straight-v": 3,
+    "turn-lu": 1,
+    "turn-rd": 1
   },
   "stars": [
-    3,
-    4
+    9,
+    12
   ],
   "fuel": null,
   "metadata": {
-    "difficulty": "medium",
-    "difficultyScore": 3.1,
-    "solutionCount": 1,
-    "optimalPieceCount": 3,
-    "pathLength": 5,
-    "turnCount": 0,
+    "difficulty": "hard",
+    "difficultyScore": 5.6,
+    "solutionCount": 2,
+    "optimalPieceCount": 9,
+    "pathLength": 11,
+    "turnCount": 4,
     "generatedBy": "csp-solver-v1",
-    "generatedAt": "2026-03-06T14:57:33.784Z",
-    "seed": 23799002
+    "generatedAt": "2026-03-06T15:56:06.024Z",
+    "seed": 145878009
   }
 }

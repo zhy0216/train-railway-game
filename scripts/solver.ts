@@ -16,6 +16,7 @@ export interface SolveInput {
   pieces: Partial<Record<TrackType, number>>;
   maxSolutions: number;
   fuel?: number;
+  timeoutMs?: number;
 }
 
 export interface Solution {
@@ -26,6 +27,12 @@ export interface Solution {
   piecesUsed: number;
 }
 
+export interface SolveResult {
+  solutions: Solution[];
+  nodeCount: number;
+  timedOut: boolean;
+}
+
 /**
  * Find all valid solutions for the given level configuration.
  *
@@ -34,9 +41,13 @@ export interface Solution {
  * This is efficient because we only explore cells the train actually visits,
  * not all empty cells on the grid.
  */
-export function solve(input: SolveInput): Solution[] {
+export function solve(input: SolveInput): SolveResult {
   const { grid, rows, cols, startDir, maxSolutions } = input;
   const maxFuel = input.fuel ?? 0;
+  const deadline = input.timeoutMs ? Date.now() + input.timeoutMs : 0;
+  let nodeCount = 0;
+  let timedOut = false;
+  const maxPathLen = rows * cols; // path can't be longer than the grid
 
   // Find S and E
   let startRow = -1, startCol = -1;
@@ -65,7 +76,15 @@ export function solve(input: SolveInput): Solution[] {
     turns: number,
     piecesUsed: number
   ): void {
-    if (solutions.length >= maxSolutions) return;
+    if (solutions.length >= maxSolutions || timedOut) return;
+    // Check timeout every 256 nodes
+    nodeCount++;
+    if (deadline && (nodeCount & 0xFF) === 0 && Date.now() > deadline) {
+      timedOut = true;
+      return;
+    }
+    // Cap path length
+    if (pathLen > maxPathLen) return;
 
     const [dr, dc] = DIR_DELTA[dir];
     const nr = row + dr;
@@ -150,12 +169,12 @@ export function solve(input: SolveInput): Solution[] {
       available[trackType]++;
       placement.delete(key);
 
-      if (solutions.length >= maxSolutions) return;
+      if (solutions.length >= maxSolutions || timedOut) return;
     }
   }
 
   visited.add(`${startRow},${startCol},${startDir}`);
   simulate(startRow, startCol, startDir, maxFuel, 1, 0, 0);
 
-  return solutions;
+  return { solutions, nodeCount, timedOut };
 }

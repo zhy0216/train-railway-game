@@ -1,18 +1,14 @@
 {
   "id": "gen-2",
-  "rows": 7,
-  "cols": 7,
+  "rows": 11,
+  "cols": 12,
   "grid": [
     [
-      1,
       0,
       0,
       0,
       0,
-      1,
-      0
-    ],
-    [
+      0,
       0,
       0,
       0,
@@ -22,15 +18,67 @@
       0
     ],
     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
       1,
       0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    [
+      1,
+      0,
+      1,
       0,
       "S",
       0,
+      0,
+      0,
       1,
-      1
+      1,
+      0,
+      0
     ],
     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      1,
+      0,
       0,
       0,
       0,
@@ -40,12 +88,45 @@
       0
     ],
     [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      0,
       0,
       "E",
       0,
       0,
       0,
-      1,
+      0,
       0
     ],
     [
@@ -53,41 +134,50 @@
       0,
       1,
       0,
+      1,
       0,
       0,
-      1
+      0,
+      0,
+      1,
+      0,
+      0
     ],
     [
       0,
+      1,
       0,
       0,
+      1,
+      0,
+      0,
+      1,
       0,
       0,
       0,
       0
     ]
   ],
-  "startDir": "left",
+  "startDir": "down",
   "pieces": {
-    "straight-h": 2,
-    "turn-rd": 1,
-    "straight-v": 1,
-    "cross": 1
+    "straight-v": 4,
+    "turn-ru": 1,
+    "straight-h": 1
   },
   "stars": [
-    3,
-    4
+    6,
+    8
   ],
   "fuel": null,
   "metadata": {
-    "difficulty": "medium",
-    "difficultyScore": 2.5,
-    "solutionCount": 3,
-    "optimalPieceCount": 3,
-    "pathLength": 5,
+    "difficulty": "hard",
+    "difficultyScore": 4.2,
+    "solutionCount": 1,
+    "optimalPieceCount": 6,
+    "pathLength": 8,
     "turnCount": 1,
     "generatedBy": "csp-solver-v1",
-    "generatedAt": "2026-03-06T14:57:33.782Z",
-    "seed": 7961002
+    "generatedAt": "2026-03-06T15:55:19.060Z",
+    "seed": 130040001
   }
 }

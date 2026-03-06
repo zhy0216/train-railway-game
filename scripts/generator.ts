@@ -170,6 +170,8 @@ export function generateLevel(config: GenerateLevelConfig): LevelData | null {
   const maxAttempts = config.maxAttempts ?? 100;
   const rng = createRng(config.seed);
 
+  console.log(`  [generateLevel] preset: grid=${preset.gridRange.minRows}-${preset.gridRange.maxRows}, obstacles=${preset.obstacleDensity.min}-${preset.obstacleDensity.max}, maxSolutions=${preset.maxSolutions}, surplus=${preset.surplusPieces.min}-${preset.surplusPieces.max}`);
+
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const attemptSeed = config.seed * 1000 + attempt;
 
@@ -188,6 +190,8 @@ export function generateLevel(config: GenerateLevelConfig): LevelData | null {
     const fuelAmount = useFuel ? Math.floor(rows * cols * 0.3) : undefined;
     const gasStations = useFuel ? Math.max(1, Math.floor((rows + cols) / 6)) : undefined;
 
+    console.log(`    [${attempt}/${maxAttempts}] ${rows}x${cols} density=${density.toFixed(2)} seed=${attemptSeed}`);
+
     // Generate board
     const board = generateBoard({
       rows, cols,
@@ -197,43 +201,71 @@ export function generateLevel(config: GenerateLevelConfig): LevelData | null {
       gasStations,
     });
 
+    console.log(`      board: S=(${board.startRow},${board.startCol}) E=(${board.endRow},${board.endCol}) dir=${board.startDir}`);
+
     // Give generous pieces first to find any solution
+    // Cap per-type count to avoid solver explosion
     const generousPieces: Partial<Record<TrackType, number>> = {};
-    const maxPieces = rows * cols;
+    const maxPieces = rows + cols;
     for (const t of ALL_TRACK_TYPES) {
       generousPieces[t] = maxPieces;
     }
 
     // Find solutions with generous pieces (to find the optimal path)
-    const generousSolutions = solve({
+    console.log(`      solve1: generous pieces (${maxPieces} each), timeout=5s...`);
+    const t0 = performance.now();
+    const solve1 = solve({
       grid: board.grid,
       rows, cols,
       startDir: board.startDir,
       pieces: generousPieces,
       maxSolutions: 1,
       fuel: fuelAmount,
+      timeoutMs: 5000,
     });
+    const solve1Ms = (performance.now() - t0).toFixed(0);
 
-    if (generousSolutions.length === 0) continue; // No path possible
+    if (solve1.solutions.length === 0) {
+      console.log(`      solve1: FAIL no path (${solve1Ms}ms, nodes=${solve1.nodeCount}${solve1.timedOut ? " TIMEOUT" : ""})`);
+      continue;
+    }
+
+    const refSolution = solve1.solutions[0];
+    console.log(`      solve1: OK path=${refSolution.pathLength} turns=${refSolution.turnCount} pieces=${refSolution.piecesUsed} (${solve1Ms}ms, nodes=${solve1.nodeCount})`);
 
     // Use the first solution as reference for piece assignment
-    const refSolution = generousSolutions[0];
     const surplusCount = preset.surplusPieces.min +
       Math.floor(createRng(attemptSeed + 3)() * (preset.surplusPieces.max - preset.surplusPieces.min + 1));
     const pieces = assignPieces(refSolution, surplusCount, createRng(attemptSeed + 4));
+    const totalPiecesGiven = Object.values(pieces).reduce((a, b) => a + (b ?? 0), 0);
+    console.log(`      pieces: ${JSON.stringify(pieces)} (total=${totalPiecesGiven}, surplus=${surplusCount})`);
 
     // Now solve with the actual pieces to count solutions
-    const solutions = solve({
+    console.log(`      solve2: counting solutions (max=${preset.maxSolutions + 1}), timeout=5s...`);
+    const t1 = performance.now();
+    const solve2 = solve({
       grid: board.grid,
       rows, cols,
       startDir: board.startDir,
       pieces,
       maxSolutions: preset.maxSolutions + 1,
       fuel: fuelAmount,
+      timeoutMs: 5000,
     });
+    const solve2Ms = (performance.now() - t1).toFixed(0);
 
-    if (solutions.length === 0) continue;
-    if (solutions.length > preset.maxSolutions) continue;
+    if (solve2.solutions.length === 0) {
+      console.log(`      solve2: FAIL no solution (${solve2Ms}ms, nodes=${solve2.nodeCount}${solve2.timedOut ? " TIMEOUT" : ""})`);
+      continue;
+    }
+    if (solve2.solutions.length > preset.maxSolutions) {
+      console.log(`      solve2: FAIL too many solutions ${solve2.solutions.length}>${preset.maxSolutions} (${solve2Ms}ms, nodes=${solve2.nodeCount})`);
+      continue;
+    }
+
+    console.log(`      solve2: OK ${solve2.solutions.length} solution(s) (${solve2Ms}ms, nodes=${solve2.nodeCount})`);
+
+    const solutions = solve2.solutions;
 
     // Find optimal solution (fewest pieces used)
     const optimal = solutions.reduce((best, s) =>
