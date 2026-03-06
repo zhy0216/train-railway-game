@@ -57,7 +57,7 @@ describe("generateLevel", () => {
     const level = generateLevel({
       difficulty: "easy",
       seed: 42,
-      maxAttempts: 100,
+      maxAttempts: 200,
     });
     expect(level).not.toBeNull();
     if (level) {
@@ -71,7 +71,7 @@ describe("generateLevel", () => {
     const level = generateLevel({
       difficulty: "medium",
       seed: 99,
-      maxAttempts: 200,
+      maxAttempts: 500,
     });
     expect(level).not.toBeNull();
     if (level) {

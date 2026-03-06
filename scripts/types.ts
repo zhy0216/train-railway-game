@@ -80,6 +80,9 @@ export interface DifficultyPreset {
   maxSolutions: number;
   surplusPieces: { min: number; max: number };
   fuel: boolean;
+  minPathLength: number;
+  minTurnCount: number;
+  minDifficultyScore: number;
 }
 
 export const DIFFICULTY_PRESETS: Record<Difficulty, DifficultyPreset> = {
@@ -89,6 +92,9 @@ export const DIFFICULTY_PRESETS: Record<Difficulty, DifficultyPreset> = {
     maxSolutions: 5,
     surplusPieces: { min: 2, max: 3 },
     fuel: false,
+    minPathLength: 3,
+    minTurnCount: 0,
+    minDifficultyScore: 0,
   },
   medium: {
     gridRange: { minRows: 7, maxRows: 10, minCols: 7, maxCols: 10 },
@@ -96,6 +102,9 @@ export const DIFFICULTY_PRESETS: Record<Difficulty, DifficultyPreset> = {
     maxSolutions: 3,
     surplusPieces: { min: 1, max: 2 },
     fuel: false,
+    minPathLength: 6,
+    minTurnCount: 1,
+    minDifficultyScore: 2,
   },
   hard: {
     gridRange: { minRows: 10, maxRows: 13, minCols: 10, maxCols: 13 },
@@ -103,6 +112,9 @@ export const DIFFICULTY_PRESETS: Record<Difficulty, DifficultyPreset> = {
     maxSolutions: 2,
     surplusPieces: { min: 0, max: 1 },
     fuel: false,
+    minPathLength: 15,
+    minTurnCount: 4,
+    minDifficultyScore: 5,
   },
   extreme: {
     gridRange: { minRows: 13, maxRows: 16, minCols: 13, maxCols: 16 },
@@ -110,5 +122,8 @@ export const DIFFICULTY_PRESETS: Record<Difficulty, DifficultyPreset> = {
     maxSolutions: 1,
     surplusPieces: { min: 0, max: 0 },
     fuel: true,
+    minPathLength: 20,
+    minTurnCount: 6,
+    minDifficultyScore: 6,
   },
 };

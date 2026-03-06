@@ -211,17 +211,19 @@ export function generateLevel(config: GenerateLevelConfig): LevelData | null {
       generousPieces[t] = maxPieces;
     }
 
-    // Find solutions with generous pieces (to find the optimal path)
-    console.log(`      solve1: generous pieces (${maxPieces} each), timeout=5s...`);
+    // Find solutions with generous pieces — find several and pick the most complex
+    const solveTimeout = config.difficulty === "easy" ? 2000 : 3000;
+    const maxGenerous = config.difficulty === "easy" ? 3 : 5;
+    console.log(`      solve1: generous pieces (${maxPieces} each), find up to ${maxGenerous}, timeout=${solveTimeout}ms...`);
     const t0 = performance.now();
     const solve1 = solve({
       grid: board.grid,
       rows, cols,
       startDir: board.startDir,
       pieces: generousPieces,
-      maxSolutions: 1,
+      maxSolutions: maxGenerous,
       fuel: fuelAmount,
-      timeoutMs: 5000,
+      timeoutMs: solveTimeout,
     });
     const solve1Ms = (performance.now() - t0).toFixed(0);
 
@@ -230,10 +232,24 @@ export function generateLevel(config: GenerateLevelConfig): LevelData | null {
       continue;
     }
 
-    const refSolution = solve1.solutions[0];
-    console.log(`      solve1: OK path=${refSolution.pathLength} turns=${refSolution.turnCount} pieces=${refSolution.piecesUsed} (${solve1Ms}ms, nodes=${solve1.nodeCount})`);
+    // Pick the solution with the most turns and longest path (= hardest)
+    const refSolution = solve1.solutions.reduce((best, s) => {
+      const bestScore = best.turnCount * 3 + best.pathLength;
+      const sScore = s.turnCount * 3 + s.pathLength;
+      return sScore > bestScore ? s : best;
+    });
+    console.log(`      solve1: ${solve1.solutions.length} solution(s), best: path=${refSolution.pathLength} turns=${refSolution.turnCount} pieces=${refSolution.piecesUsed} (${solve1Ms}ms, nodes=${solve1.nodeCount})`);
 
-    // Use the first solution as reference for piece assignment
+    // Reject if path is too short or simple for the difficulty
+    if (refSolution.pathLength < preset.minPathLength) {
+      console.log(`      SKIP: path too short ${refSolution.pathLength} < ${preset.minPathLength}`);
+      continue;
+    }
+    if (refSolution.turnCount < preset.minTurnCount) {
+      console.log(`      SKIP: too few turns ${refSolution.turnCount} < ${preset.minTurnCount}`);
+      continue;
+    }
+    // Use the best solution as reference for piece assignment
     const surplusCount = preset.surplusPieces.min +
       Math.floor(createRng(attemptSeed + 3)() * (preset.surplusPieces.max - preset.surplusPieces.min + 1));
     const pieces = assignPieces(refSolution, surplusCount, createRng(attemptSeed + 4));
@@ -286,6 +302,13 @@ export function generateLevel(config: GenerateLevelConfig): LevelData | null {
       obstacleProximity: obstacleProx,
       piecePrecision,
     });
+
+    console.log(`      quality: path=${optimal.pathLength} turns=${optimal.turnCount} obstacle=${obstacleProx.toFixed(2)} precision=${piecePrecision.toFixed(2)} score=${diffScore.toFixed(1)}`);
+
+    if (diffScore < preset.minDifficultyScore) {
+      console.log(`      SKIP: score too low ${diffScore.toFixed(1)} < ${preset.minDifficultyScore}`);
+      continue;
+    }
 
     const [s3, s2] = calculateStars(optimal.piecesUsed, totalPieces);
 
